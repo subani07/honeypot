@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HoneyShield — Threat Dashboard</title>
+  <meta name="description" content="Real-time honeypot monitoring dashboard — track attackers, capture credentials, and analyse threat patterns." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Socket.IO -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-brand">
+    <div class="logo-icon">🍯</div>
+    <div>
+      <h1 class="brand-name">HoneyShield</h1>
+      <span class="brand-sub">Threat Intelligence Dashboard</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="live-badge" id="liveBadge">
+      <span class="pulse-dot"></span> LIVE
+    </span>
+    <div class="clock" id="clock"></div>
+  </div>
+</header>
+
+<!-- ── Stat Cards ─────────────────────────────────────────────────────────── -->
+<main class="container">
+  <section class="stat-grid">
+    <div class="stat-card" id="card-total">
+      <div class="stat-icon">⚡</div>
+      <div class="stat-info">
+        <div class="stat-value" id="totalEvents">0</div>
+        <div class="stat-label">Total Attacks</div>
+      </div>
+    </div>
+    <div class="stat-card" id="card-unique">
+      <div class="stat-icon">👤</div>
+      <div class="stat-info">
+        <div class="stat-value" id="uniqueIPs">0</div>
+        <div class="stat-label">Unique Attackers</div>
+      </div>
+    </div>
+    <div class="stat-card" id="card-service">
+      <div class="stat-icon">🔌</div>
+      <div class="stat-info">
+        <div class="stat-value" id="topService">—</div>
+        <div class="stat-label">Most Targeted</div>
+      </div>
+    </div>
+    <div class="stat-card" id="card-recent">
+      <div class="stat-icon">🕐</div>
+      <div class="stat-info">
+        <div class="stat-value" id="recentCount">0</div>
+        <div class="stat-label">Last Hour</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Charts Row ──────────────────────────────────────────────────────── -->
+  <section class="charts-grid">
+    <div class="chart-card wide">
+      <div class="chart-header">
+        <span class="chart-title">⏱ Attack Timeline <span class="chart-sub">(last 24h)</span></span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="timelineChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">🔌 Service Distribution</span>
+      </div>
+      <div class="chart-wrap chart-small">
+        <canvas id="serviceChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tables Row ──────────────────────────────────────────────────────── -->
+  <section class="tables-grid">
+    <!-- Live Feed -->
+    <div class="table-card">
+      <div class="table-header">
+        <span class="table-title">🔴 Live Attack Feed</span>
+        <button class="btn-clear" onclick="clearFeed()">Clear</button>
+      </div>
+      <div class="feed-container" id="liveFeed"></div>
+    </div>
+
+    <!-- Top Attackers -->
+    <div class="table-card">
+      <div class="table-header">
+        <span class="table-title">🏴 Top Attackers</span>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table" id="topIpTable">
+          <thead><tr><th>#</th><th>IP Address</th><th>Country</th><th>Hits</th><th>Bar</th></tr></thead>
+          <tbody id="topIpBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Credentials Table ───────────────────────────────────────────────── -->
+  <section class="full-card">
+    <div class="table-header">
+      <span class="table-title">🔑 Captured Credentials</span>
+      <span class="cred-count" id="credCount">0 captured</span>
+    </div>
+    <div class="table-scroll">
+      <table class="data-table" id="credTable">
+        <thead>
+          <tr>
+            <th>Time (UTC)</th>
+            <th>IP</th>
+            <th>Location</th>
+            <th>Username</th>
+            <th>Password</th>
+          </tr>
+        </thead>
+        <tbody id="credBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</body>
+</html>

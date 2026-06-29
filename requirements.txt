@@ -1,0 +1,5 @@
+paramiko==3.4.0
+flask==3.0.3
+flask-socketio==5.3.6
+requests==2.31.0
+simple-websocket==1.0.0
